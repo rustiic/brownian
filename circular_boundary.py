@@ -24,24 +24,13 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
     gamma = 6*np.pi*R*eta	# friction coefficient [Ns/m]
     DT = kB*T/gamma		    # translational diffusion coefficient [m^2/s]
     DR = 6*DT/(8*R**2)      # rotational diffusion coefficient [rad^2/s]
-    
-    # A remnant from the first version where I'd used np arrays
-    #X = np.zeros((N,2), float)  
-
-    
 
     theta1 = 0         # initial conditions (angle)
-    theta2 = 0
     
     evo11   = np.sqrt(2*DT*dt)
     evo12   = np.sqrt(2*DR*dt)
     torque1 = dt*W
     evoc1   = dt*V
-
-    evo21    = np.sqrt(2*DT*dt)
-    evo22    = np.sqrt(2*DR*dt)
-    torque2  = dt*W
-    evoc2    = dt*V
 
     scale = evo11*50              #Scale for the axes and plot
     L = scale                     #this is the dimension of the box
@@ -88,7 +77,7 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
         c1 = a1 / b1
         a2 = c1**2 + 1
         b2 = 2*c1*(x1 - c1*y1)
-        c2 = x1**2 + (c1*y1)**2 - 2*c1*y1*x1 - R**2
+        c2 = x1**2 + (c1*y1)**2 - 2*c1*y1*x1 - L**2
 
         len_path = dist(x2 - x1, y2 - y1)
         
@@ -100,7 +89,6 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
                     if len_path == dist(x1 - xc, y1 - yc) + dist(x2 - xc, y2 - yc):
                         break
 
-
         v_dot_n = (xc*(xc - x1) + yc*(yc-y1))/(L * dist(xc - x1, yc - y1))
 
         rx = x1 - 2*v_dot_n*xc
@@ -110,9 +98,7 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
 
 
     for i in range(N):
-
-        #'''
-        #Particle 1
+        
         delta_x1 += evo11*rando()
         delta_y1 += evo11*rando()
         theta1 += evo12*random.random() #*rando_sign()
@@ -120,17 +106,13 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
         delta_x1 += evoc1*np.cos(theta1)*rando_sign()
         delta_y1 += evoc1*np.sin(theta1)*rando_sign()
 
-        # Now for reflection from the walls
-        if np.sqrt(delta_x1**2 + delta_y1**2) > L:
-            (delta_x1, delta_y1) = solver(xi, yi, delta_x1, delta_y1)
-        
-        # The following code block is for another particle moving in the medium
-        #   simultaneously, complete with collisions. 
-        #   Since I later decided to make EVERY MODIFICATION TO THE SAME GODDAMN
-        #   FILE, I had to comment whole blocks out.
-        
-        #This block is for a square box
+        #Reflection from circular walls
         '''
+        if dist(delta_x1, delta_y1) > L:
+            (delta_x1, delta_y1) = solver(xi, yi, delta_x1, delta_y1)
+        '''
+        #This block is for a square box
+        #'''
         if abs(delta_x1) > L:
             delta_x1 -= 2*np.sign(delta_x1)*(abs(delta_x1) - L)
             #T = Bt + (T - Bt)*np. 
