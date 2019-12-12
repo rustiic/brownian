@@ -50,16 +50,12 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
 
 
     delta_x1, delta_y1 = 0.99*scale, -0.25*scale
-    delta_x2, delta_y2 = 0, -0.99*scale
+    delta_x1, delta_y1 = 0, -0.99*scale
     
     X1 = []
     Y1 = []
 
     x1, y1, xi, yi = 0, 0, 0, 0
-    '''
-    X2 = []
-    Y2 = []
-    #'''
 
     # Output to file, which I was initially using to plot with GNUPlot
     #f = open('data.out', 'w')
@@ -133,34 +129,16 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
         #   Since I later decided to make EVERY MODIFICATION TO THE SAME GODDAMN
         #   FILE, I had to comment whole blocks out.
         
+        #This block is for a square box
         '''
-        #Particle 2
-        delta_x2 += evo21*rando()
-        delta_y2 += evo21*rando()
-        theta2 += evo22*random.random() #*((-1)**(int((random.random()*10)%2)))
-        theta2 += torque2        
-        delta_x2 += evoc2*np.cos(theta2)*rando_sign()
-        delta_y2 += evoc2*np.sin(theta2)*rando_sign()
-        if abs(delta_x2) > L:
-            delta_x2 -= 2*np.sign(delta_x2)*(abs(delta_x2) - L)
+        if abs(delta_x1) > L:
+            delta_x1 -= 2*np.sign(delta_x1)*(abs(delta_x1) - L)
             #T = Bt + (T - Bt)*np. 
             #evo21 = evo21*np.sqrt(Bt/T)
         
-        if abs(delta_y2) > L:
-            delta_y2 -= 2*np.sign(delta_y2)*(abs(delta_y2) - L)
+        if abs(delta_y1) > L:
+            delta_y1 -= 2*np.sign(delta_y1)*(abs(delta_y1) - L)
             #evo21 = evo21*np.sqrt(Bt/T)
-        
-        x2 = delta_x2
-        y2 = delta_y2
-        if (delta_x1, delta_y1)==(delta_x2, delta_x2):
-            plt.Circle((x2, y2), 0.5*scale, color='y')
-            delta_x2 -= 2*np.sign(delta_x2)*(abs(delta_x2) - abs(delta_x1))
-            delta_y2 -= 2*np.sign(delta_y2)*(abs(delta_y2) - abs(delta_y1))
-            delta_x1 -= 2*np.sign(delta_x1)*(abs(delta_x1) - abs(x2))
-            delta_y1 -= 2*np.sign(delta_y1)*(abs(delta_y1) - abs(y2))
-
-        X2 =  np.append(X2, delta_x2)
-        Y2 =  np.append(Y2, delta_y2)
         #'''
 
         X1 =  np.append(X1, delta_x1)
@@ -172,30 +150,26 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
 
         #print("%s \t %s \n" %(delta_x1, delta_y1), file=f)
 
-        # Erasing Tracks
+        # This following block of code plots and erases tracks interatively
         #'''
         if i > (track):
             plt.clf()
             plt.plot(X1[i-track:i], Y1[i-track:i], 'b-')
-            #plt.plot(X2[i-track:i], Y2[i-track:i], 'r-')
             plt.axis(( -scale, scale, -scale, scale))
             plt.pause(0.0001)
         else:
             plt.plot(X1, Y1, 'b-')
-            #plt.plot(X2, Y2, 'r-')
             plt.axis(( -scale, scale, -scale, scale))
             plt.pause(0.00001)
         
         #'''
 
-    #'''
+    #this block is for plotting the graph at the end of runtime
     plt.xlabel('X')
     plt.ylabel('Y')
     plt.plot(X1, Y1, 'r-')
-    #plt.plot(X2, Y2, 'b-')
     plt.axis(( -scale, scale, -scale, scale))
     plt.savefig('active_swimmer_plot.png')
-    #'''
 
     return
 
