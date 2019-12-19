@@ -1,60 +1,50 @@
 import numpy as np
 #import random
-from random import SystemRandom, random, randrange
+from random import SystemRandom, random, randint
 import matplotlib.pyplot as plt
 
 
 size = 1000   #Specifies the size of the arrays
-passes  = 5
+moment = 5
 
 cryptogen = SystemRandom()
-randon, crypton = np.zeros(passes - 1, dtype=int), np.zeros(passes - 1, dtype=int)
+randon, crypton = np.zeros(moment, dtype=float), np.zeros(moment, dtype=float)
+#silly = np.zeros(moment, dtype=float)
 
 def rando():
-    return randrange(size)
+    return randint(0, 1000)
 
 def crypto():
-    return cryptogen.randrange(size)
+    return cryptogen.randint(0, 1000)
 
 
-X = np.zeros((passes, size), dtype=int)
-Y = np.zeros((passes, size), dtype=int)
-t = np.zeros(size, dtype=int)
+X = np.zeros(size, dtype=float)
+Y = np.zeros(size, dtype=float)
+#Z = np.zeros(size, dtype=float)
 
-
-for i in range(size*1000):
-    for j in range(passes):
-        x = rando()
-        y = crypto()
-        X[j][x] += 1
-        Y[j][y] += 1
-
-#'''
-for i in range(passes - 1):
-    for j in range(size):
-        X[i + 1][j] -= X[0][i]
-        X[i + 1][j] = abs(X[i + 1][j])
-        Y[i + 1][j] -= Y[0][i]
-        Y[i + 1][j] = abs(Y[i + 1][j])
-#'''
 
 for i in range(size):
-    X[0][i] = 0
-    Y[0][i] = 0
-    t[i] = 1
-    for j in range(passes - 1):
-        randon[j]  += X[j+1][i]
-        crypton[j] += Y[j+1][i]
+    x = rando()
+    y = crypto()
+    #z = randint(500, 999)
+    X[x-1] += 1/size
+    Y[y-1] += 1/size
+    #Z[z-1] += 1/size
 
-X = np.transpose(X)
-Y = np.transpose(Y)
 
+for i in range(moment):
+    for j in range(size):
+        randon[i]  += (j**(i+1))*X[j]
+        crypton[i] += (j**(i+1))*Y[j]
+
+#'''
 f, axarr = plt.subplots(2, sharex=True)
 axarr[0].plot(X, 'b-')
 axarr[0].set_title('random.random()')
 axarr[1].plot(Y, 'r-')
 axarr[1].set_title('SystemRandom')
 plt.savefig('plot.png')
+#'''
 
-for i in range(passes - 1):
-    print("\n {}) Rando {} \t Crypto: {}".format( i+1, randon[i], crypton[i]))
+for i in range(moment):
+    print("\n {}th moment of \n Rando : {} \n Crypto: {}".format( i+1, randon[i], crypton[i]))
