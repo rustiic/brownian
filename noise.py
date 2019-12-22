@@ -45,8 +45,11 @@ def Sample(size, moment):
     # axarr[1].plot(Y, 'r-')
     # axarr[1].set_title('SystemRandom')
     # plt.savefig('plot.png')
+    
+    file = open('out', 'w')
 
     for i in range(moment):
-        print("\n {}th moment of \n Rando : {} \n Crypto: {}".format( i+1, randon[i], crypton[i]))
+        file.write("\n {}th moment of \n Rando : {} \n Crypto: {}".format( i+1, randon[i], crypton[i]))
+    file.close()
 
 Sample(1000, 20)
