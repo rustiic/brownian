@@ -1,7 +1,9 @@
+from numba import jit
 import numpy as np
 import scipy
-import random
+from random import SystemRandom, random, randint
 import matplotlib.pyplot as plt
+from noise import *
 
 
 
@@ -16,7 +18,6 @@ import matplotlib.pyplot as plt
 
 #W  is the angular velocity
 #W = float(input("Enter anglular Velocity : "))
-
 def homogenous(N, P, dt, R, T, Bt, eta, V, W):
     
 
@@ -51,66 +52,33 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
     #print("X position \t Y position \n", file = f)
     
     # Interactive on, to make plot interative
-
-    # So I use random numbers a lot:
-    #   The first returns either a 1 or -1
-    #   The second returns a random no multiplied to -1 or 1
-    def rando_sign():
-        return ((-1)**(int((random.random()*10)%2)))
-
-    def rando():
-        return random.random()*rando_sign()
-    
     #plt.ion()
 
 
     #Obstacles, here tiny cones which will trap the swimmers
 
+    dist = Sample(N, 100)
 
-    def dist(a, b):
-        return np.sqrt(a**2 + b**2)
-
-
-    def solver(x1, y1, x2, y2):
-        a1 = x2 - x1
-        b1 = y2 - y1
-        c1 = a1 / b1
-        a2 = c1**2 + 1
-        b2 = 2*c1*(x1 - c1*y1)
-        c2 = x1**2 + (c1*y1)**2 - 2*c1*y1*x1 - L**2
-
-        len_path = dist(x2 - x1, y2 - y1)
-        
-        for i in range(2):
-            for j in range(2):
-                yc = (-b2 + (-1**(2-i))*np.sqrt(b2**2 - 4*a2*c2)) / (2 * a2)
-                xc = (-1**(2-j))*np.sqrt(L**2 - yc**2)
-                if dist(xc, yc) == L:
-                    if len_path == dist(x1 - xc, y1 - yc) + dist(x2 - xc, y2 - yc):
-                        break
-
-        v_dot_n = (xc*(xc - x1) + yc*(yc-y1))/(L * dist(xc - x1, yc - y1))
-
-        rx = x1 - 2*v_dot_n*xc
-        ry = y1 - 2*v_dot_n*yc
-
-        return (rx, ry)
 
 
     for i in range(N):
         
-        delta_x1 += evo11*rando()
-        delta_y1 += evo11*rando()
-        theta1 += evo12*random.random() #*rando_sign()
+        # delta_x1 += evo11*rando()
+        # delta_y1 += evo11*rando()
+        delta_x1 += dist[sys_rand_num(0, N)]
+        delta_y1 += dist[sys_rand_num(0, N)]
+        theta1 += evo12*random() #*rando_sign()
         theta1 += torque1
         delta_x1 += evoc1*np.cos(theta1)*rando_sign()
         delta_y1 += evoc1*np.sin(theta1)*rando_sign()
 
-        #Reflection from circular walls
+        #This block is for reflection from circular walls
+        #DOES NOT WORK YET
         '''
         if dist(delta_x1, delta_y1) > L:
             (delta_x1, delta_y1) = solver(xi, yi, delta_x1, delta_y1)
         '''
+
         #This block is for a square box
         #'''
         if abs(delta_x1) > L:
@@ -145,12 +113,19 @@ def homogenous(N, P, dt, R, T, Bt, eta, V, W):
             plt.pause(0.00001)
         
         #'''
+    
+    file = open('out.txt', 'w')
+    # file.write("X \t \t Y \n")
+    for i in range(N):
+        file.write("{:.4E} \t {:.4E} \n".format(X1[i], Y1[i]))
+    file.close()
 
     #this block is for plotting the graph at the end of runtime
-    plt.xlabel('X')
-    plt.ylabel('Y')
-    plt.plot(X1, Y1, 'r-')
-    plt.axis(( -scale, scale, -scale, scale))
+    # plt.xlabel('X')
+    # plt.ylabel('Y')
+    plt.plot(X1, 'r-')
+    # plt.plot(Y1, 'b-')
+    # plt.axis(( -scale, scale, -scale, scale))
     plt.savefig('active_swimmer_plot.png')
 
     return
